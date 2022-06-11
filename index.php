@@ -1,73 +1,73 @@
 <?php
-//echo uniqid();
-if(isset($_POST["donate"])){
-   $name = htmlspecialchars($_POST["name"]);
-   $email = htmlspecialchars($_POST["email"]);
-   $phone_number = htmlspecialchars($_POST["phone"]);
-   $amount = htmlspecialchars($_POST["amount"]);
+if(isset($_POST['donate'])) {
+    $fullname=htmlspecialchars($_POST['fullname']);
+    $email=htmlspecialchars($_POST['email']);
+    $phone=htmlspecialchars($_POST['phone']);
+    $amount=htmlspecialchars($_POST['amount']);
 
-//Integrate Rave pament
+
+//Integrate the endpoint from the flutterwave standard page
 $endpoint = "https://api.flutterwave.com/v3/payments";
 
-//Required Data
-$postdata = array(
-    "tx_ref" => uniqid().uniqid(),
-    "currency" => "NGN",
-    "amount" => $amount,
-    "customer" =>array(
-        "name" => $name,
-        "email" => $email,
-        "phone_number" => $phone_number
-    ),
-    "customizations" =>array(
-        "title" => "Donate to the less previledged!",
-        "description" => "A page for the collection of donatios to the needy"
-    ),
+//Get datas from users
+$get_datas=[
+    "tx_ref"=>uniqid().uniqid().uniqid(),
+    "Currency"=>"NGN",
+    "Amount"=>$amount,
+    "Donators"=> [
+        "name"=>$fullname,
+        "email"=>$email,
+        "phone"=>$phone
+    ],
+    "Customizations"=> [
+        "title"=>"Donations to the less priviledged!!!",
+        "description"=>"A page to collection donations to support less privilegde"
+    ],
+    "meta"=> [
+        "purpose" => "To help the poor!",
+        "address" => "Ife city,Osun state"
+    ],
+    "redirected_url"=>"http://localhost/flutterwave/verify.php"
+];
 
-    "meta" =>array(
-        "reason" => "To help the poor!",
-        "address" => "2b, UNN Road Nsukka"
-    ),
-    "redirect_url" => "http://localhost/flutterwave/verify.php"
-);
 
-//Init cURL handler
-$ch = curl_init();
+//curl init
+$set=curl_init();
 
-//Turn of SSL checking
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-
-//Set the endpoint
-curl_setopt($ch, CURLOPT_URL, $endpoint);
+//turn off the ssl checking
+curl_setopt($set, CURLOPT_SSL_VERIFYPEER, 0);
 
 //Turn on the cURL post method
-curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($set, CURLOPT_POST, 1);
 
-//Encode the post field
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postdata));
+//json_encode will take the informations as an array
+curl_setopt($set, CURLOPT_POSTFIELDS, json_encode($get_datas));
 
 //Make it reurn data
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($set, CURLOPT_RETURNTRANSFER, true);
 
-//Set the waiting timeout
-curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 200);
-curl_setopt($ch, CURLOPT_TIMEOUT, 200);
+//Set the connection timeout
+curl_setopt($set, CURLOPT_CONNECTTIMEOUT, 200);
 
 //Set the headers from endpoint
-curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-   "Authorization: Bearer FLWSECK_TEST-7a1ab997e04eb83e5fbd254ce0fba870-X",
+//we login to our dashboard
+curl_setopt($set, CURLOPT_HTTPHEADER, array(
+   "Authorization: Bearer FLWSECK_TEST-327372e04bc3fa192ba248b7cbe8ecb4-X",
    "Content-Type: Application/json",
    "Cache-Control: no-cahe"
 ));
 
 //Execute the cURL session
-$request = curl_exec($ch);
+$execute = curl_exec($set);
 
-$result = json_decode($request);
-header("Location: ".$result->data->link);
-//var_dump($result);
+//covert the datas to object
+$result = json_decode($execute);
+
+header("Location: ". $result);
+
 //Close the cURL session
-curl_close($ch);
+curl_close($set);
+
 }
 
 ?>
@@ -77,25 +77,42 @@ curl_close($ch);
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rave or Flutterwave Integration in PHP and cURL</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>DONATION PAGE</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-   <h1>Rave Integration!</h1>
-   <hr>
-   <div class="container">
-    <form action="" method="post">
-     <label>Full Name:</label>
-     <input type="text" name="name" placeholder="Enter full name here...">
-     <label>Email:</label>
-     <input type="email" name="email" placeholder="Enter your email here...">
-     <label>Phone Number:</label>
-     <input type="text" name="phone" placeholder="Enter your phone number here...">
+    <div class="container">
+        <div class="header">
+            <nav>
+                <header>DW</header>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <div class="edit-donate-list"><li><a href="#">Donate</a></li></div>
+                </ul>
+            </nav>
+        </div>
 
-    <label>Amount:</label>
-     <input type="text" name="amount" placeholder="Enter amount..">
-     <input type="submit" name="donate" value="Donate">
-    </form>
-   </div> 
+       <div class="form-container">
+        <div class="form">
+            <form method="POST">
+                <h1>Donate Today</h1>
+                <input type="text" name="fullname" placeholder="Enter your fullname" required /> <br>
+                <input type="email" name="email" placeholder="Email"  required/> <br>
+                <input type="phone" name="phone" placeholder="Phone"  required/> <br>
+                <input type="number" name="amount" required placeholder="Enter the Amount you want to donate" />
+                <a href=""><button type="submit" name="donate"  required value="submit">Donate</button></a>
+            </form>
+       </div>
+       <div class="options">
+            <div class="optiona"></div>
+            <div class="optionb"></div>
+            <div class="optionc"></div>
+        </div>
+
+
+        </div>
+    </div>
 </body>
 </html>
