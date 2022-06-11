@@ -1,4 +1,5 @@
 <?php
+//fetch datas from the url
 if(isset($_GET["transaction_id"]) AND isset($_GET["status"])  AND isset($_GET["tx_ref"])){
     $trans_id = htmlspecialchars($_GET['transaction_id']);
     $trans_status = htmlspecialchars($_GET['status']);
@@ -20,7 +21,7 @@ if(isset($_GET["transaction_id"]) AND isset($_GET["status"])  AND isset($_GET["t
     
     //Set the API headers
     curl_setopt($curl, CURLOPT_HTTPHEADER, [
-        "Authorization: Bearer FLWSECK_TEST-7a1ab997e04eb83e5fbd254ce0fba870-X",
+        "Authorization: Bearer FLWSECK_TEST-327372e04bc3fa192ba248b7cbe8ecb4-X",
         "Content-Type: Application/json"
     ]);
 
@@ -32,11 +33,10 @@ if(isset($_GET["transaction_id"]) AND isset($_GET["status"])  AND isset($_GET["t
     if($error){
         die("Curl returned some errors: " . $error);
     }
-
-   //echo"<pre>" . $run . "</pre>";
-   //Convert to json obj
    $result = json_decode($run);
 
+//so now we want to fetch informations
+//->we are accesssing informations in an array as object via using json_decode
   $status = $result->data->status;
   $message = $result->message;
   $id = $result->data->id;
@@ -46,12 +46,12 @@ if(isset($_GET["transaction_id"]) AND isset($_GET["status"])  AND isset($_GET["t
   $fullName =  $result->data->customer->name;
   $email =  $result->data->customer->email;
   $phone =  $result->data->customer->phone_number;
+  //you can echo each out to check the results
 
   if(($status != $trans_status) OR ($trans_id != $id)){
      header("Location: index.php");
      exit;
   }else{
-      //Give value
   }
   curl_close($curl);
 
@@ -60,14 +60,13 @@ if(isset($_GET["transaction_id"]) AND isset($_GET["status"])  AND isset($_GET["t
      exit; 
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rave or Flutterwave Integration in PHP and cURL</title>
+    <title>DONATION VERIFICATION PAGE</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
